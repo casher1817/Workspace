@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+
+def search_ptt(keyword, board='Gossiping', pages=3):
+    session = requests.Session()
+    # PTT 18+ 驗證
+    session.cookies.set('over18', '1')
+    results = []
+
+    for page in range(pages):
+        url = f'https://www.ptt.cc/bbs/{board}/index{"" if page == 0 else page}.html'
+        res = session.get(url)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        articles = soup.select('div.r-ent')
+        for article in articles:
+            title_tag = article.select_one('div.title a')
+            if title_tag and keyword in title_tag.text:
+                link = 'https://www.ptt.cc' + title_tag['href']
+                results.append({'title': title_tag.text.strip(), 'url': link})
+    return results
+
+if __name__ == '__main__':
+    keyword = '分析'
+    board = 'Gossiping'
+    results = search_ptt(keyword, board, pages=3)
+    for r in results:
+        print(f"{r['title']} - {r['url']}")
