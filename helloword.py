@@ -1,1 +1,2 @@
-print("越來越難誠實設計")
+print("設計")
+# Output: <class 'int'>
